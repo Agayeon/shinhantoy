@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>주문 상세 페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            const search = new URLSearchParams(location.search);
+            const order_id = search.get('order_id');
+            if (order_id > 0) {
+                $.get("http://127.0.0.1:8000/api/order/" + order_id)
+                    .then((result) => {
+                        $("#ord_ymd").text(result.ord_ymd);
+                        $("#ord_no").text(result.ord_no);
+                    });
+                $.get("http://127.0.0.1:8000/api/order/" + order_id + '/comment') 
+                    .then((result) => {
+                        for (let i=0; i<result.results.length; i++) {
+                            const comment = result.results[i];
+                            
+                            $("#commentList").append(
+                                $(`<li class="list-group-item">
+                                    작성자: ${comment.member_username} (${comment.tstamp})<br>
+                                    내용: ${comment.content}<br>
+                                    
+                                </li>`)
+                            );
+                        }
+                    });
+            }
+        });
+        function comment() {
+            const search = new URLSearchParams(location.search);
+            const order_id = search.get('order_id');
+            console.log(order_id);
+            $.ajax({
+                    type: 'POST',
+                    url: "http://127.0.0.1:8000/api/order/" + order_id + '/comment',
+                    data: {
+                        order: order_id,
+                        content : $('#comment').val(),
+                    },
+                    beforeSend:function(xhr) {
+                        xhr.setRequestHeader("Authorization", "JWT " + $("#token").val()); 
+
+                    },
+                    success: (result) => {
+                       alert('댓글이 등록되었습니다.');
+                    },
+                    error: (result) => {
+                        console.error(result);
+                    }
+                });
+            }
+        
+
+    </script>
+  </head>
+  <body>
+    <div class="container">
+        <h1 id="Name" class="text-center"></h1>
+        <ul>
+            <li>주문 번호: <span id="ord_no"></span></li>
+            <li>일자: <span id="ord_ymd"></span></li>
+        </ul>
+        <hr>
+        <div>
+            <div class="container">
+                <div id="commentList"></div>
+                <div class="row mb-3">
+                    <label for="comment" class="col-sm-2 col-form-label">댓글 입력</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="comment" name="comment">
+                    </div>
+                </div>
+            <div class="row mb-3">
+                <label for="token">토큰</label>
+                <input type="text" class="form-control" id="token" name="token">
+            </div>
+                <button type="submit" class="btn btn-primary" onclick='comment()'>작성</button>
+                <div id="token"></div>
+            </div>
+            
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+  </body>
+</html>
