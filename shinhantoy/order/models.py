@@ -26,6 +26,6 @@ class Comment(models.Model):
     tstamp = models.DateTimeField(auto_now_add=True, verbose_name='등록일시')
 
     class Meta:
-        db_table = 'shinhan_comment'
+        db_table = 'shinhan_order_comment'
         verbose_name = '주문 댓글'
         verbose_name_plural = '주문 댓글'

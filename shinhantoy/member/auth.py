@@ -24,4 +24,4 @@ class MemberAuth:
             member = Member.objects.get(pk=pk)
         except Member.DoesNotExist:
             return None
-        return member# if member.is_active and member.status == '일반' else None
+        return member

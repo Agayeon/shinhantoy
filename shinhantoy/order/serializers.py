@@ -3,10 +3,6 @@ from rest_framework import serializers
 from .models import Order, Comment
 
 class OrderSerializer(serializers.ModelSerializer):
-    comment_count = serializers.SerializerMethodField()
-    
-    def get_comment_count(self,obj):
-        return obj.comment_set.all().count()
 
     class Meta:
         model = Order
@@ -14,8 +10,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer): # 가져가기 위한 serializer
-    # order_name = serializers.SerializerMethodField()
     member_username = serializers.SerializerMethodField()
+
     tstamp = serializers.DateTimeField(
         read_only=True, format='%Y-%m-%d %H:%M:%S'
     )
@@ -33,10 +29,8 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         required=False
     )
 
-    def validate_member(self, value):
-        if not value.is_authenticated:
-            raise serializers.ValidationError("Login is required")
-        return value
+    def get_order_id(self,obj):
+        return obj.order.pk
 
     class Meta:
         model = Comment

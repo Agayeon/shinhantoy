@@ -10,9 +10,6 @@ from django.contrib.auth.hashers import check_password, make_password
 from .serializers import MemberSerializer
 from .models import Member
 
-# Create your views here.
-
-
 class MemberRegisterView(
     mixins.CreateModelMixin,
     generics.GenericAPIView
@@ -22,33 +19,10 @@ class MemberRegisterView(
     def post(self, request, *args, **kwargs):
         return self.create(request, args, kwargs)
 
-# class MemberRegisterView(APIView):
-#     def post(self, request, *args, **kwargs):
-#         username = request.data.get('username')
-#         password = request.data.get('password')
-#         tel = request.data.get('tel')
-
-#         if Member.objects.filter(username=username).exists():
-#             return Response({
-#                 'detail': 'Already used',
-#             }, status=status.HTTP_400_BAD_REQUEST)
-
-#         member = Member(
-#             username=username,
-#             password=make_password(password),
-#             tel=tel,
-#         )
-#         member.save()
-#         return Response({
-#             'id': member.id,
-#             'username': username,
-#             'tel': tel
-#         },status=status.HTTP_201_CREATED)
 class MemberChangePassWordView(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, *args, **kwargs):
-        username = request.data.get('username')
         current = request.data.get('current')
         password1 = request.data.get('password1')
         password2 = request.data.get('password2')
@@ -58,11 +32,13 @@ class MemberChangePassWordView(APIView):
                 'detail1': 'Wrong new passwords',
             }, status = status.HTTP_400_BAD_REQUST)
         
-        member = request.user    
+        member = request.user 
+
         if not check_password(current, member.password):
             return Response({'detail1': 'Wrong new passwords',
             }, status = status.HTTP_400_BAD_REQUST)
-        request.user.password=make_password(password1)
-        request.user.save()
 
-        return Response(status=status.HTTP_201_CREATED)
+        member.user.password=make_password(password1)
+        member.user.save()
+
+        return Response(status=status.HTTP_200_OK)
