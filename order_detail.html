@@ -15,12 +15,14 @@
             if (order_id > 0) {
                 $.get("http://127.0.0.1:8000/api/order/" + order_id)
                     .then((result) => {
+                        const keys = Object.keys(result);
                         $("#info").html("");
+                        
                         for (let i=0; i<keys.length; i++){
                             let key = keys[i];
                             $("#info").append(
                                 $(`<li>${key}: ${result[key]}</li>`)
-                            )
+                            );
                         }
                     });
                 $.get("http://127.0.0.1:8000/api/order/" + order_id + '/comment') 
@@ -36,7 +38,7 @@
                                     ${comment.content}
                                     
                                 </li>`)
-                            );
+                            )
                         }
                     });
             }
@@ -67,10 +69,9 @@
   </head>
   <body>
     <div class="container">
-        <ul id="info">
-        </ul>
+        <ul id="info"> </ul>
         <hr>
-        <h5>댓글 쓰기</h5>
+        <h5>댓글</h5>
         <div class="form-group mb-3">
             <label for="token">토큰</label>
             <input type="text" class="form-control" id="token" name="token" />
